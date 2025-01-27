@@ -9,25 +9,41 @@ import SwiftUI
 
 struct RecipeRow: View {
     let recipe: Recipe
+    @ObservedObject var viewModel: RecipeListViewModel
+    @State private var image: UIImage?
 
     var body: some View {
         HStack {
-            if let imageURL = recipe.photoURLSmall {
-                AsyncImage(url: imageURL) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image.resizable().scaledToFit()
-                    default:
-                        ProgressView()
-                    }
+            if let url = recipe.photoURLSmall {
+                if let cachedImage = image {
+                    // SwiftUI provides AsyncImage but for purpose of explicit implementation of caching use Image
+                    Image(uiImage: cachedImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
+                        .cornerRadius(8)
+                } else {
+                    ProgressView()
+                        .frame(width: 80, height: 80)
+                        .task {
+                            await loadImage(url)
+                        }
                 }
-                .frame(width: 80, height: 80)
-                .cornerRadius(8)
             }
+
             VStack(alignment: .leading) {
-                Text(recipe.name).font(.headline)
-                Text(recipe.cuisine).font(.subheadline).foregroundColor(.gray)
+                Text(recipe.name)
+                    .font(.headline)
+                Text(recipe.cuisine)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
             }
+        }
+    }
+
+    private func loadImage(_ url: URL) async {
+        if let fetchedImage = await viewModel.loadImage(for: url) {
+            image = fetchedImage
         }
     }
 }
