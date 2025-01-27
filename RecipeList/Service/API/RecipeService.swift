@@ -25,6 +25,8 @@ final class RecipeService: RecipeServiceProtocol {
     }
     
     private let recipiesListURL = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes.json"
+    //private let recipiesListURL = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-malformed.json"
+    //private let recipiesListURL = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-empty.json"
 
     func fetchRecipes() async throws -> [Recipe] {
         guard let url = URL(string: recipiesListURL) else {
