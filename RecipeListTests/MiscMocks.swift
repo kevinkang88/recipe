@@ -14,15 +14,31 @@ class MockRecipeService: RecipeServiceProtocol {
 
     func fetchRecipes() async throws -> [Recipe] {
         if shouldFail {
-            throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Mock error"])
+            throw NSError(
+                domain: "",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Mock error"]
+            )
         }
         return [
-            Recipe(id: UUID(), cuisine: "Italian", name: "Test Recipe", photoURLSmall: nil, photoURLLarge: nil, sourceURL: nil, youtubeURL: nil)
+            Recipe(
+                id: UUID(),
+                cuisine: "Italian",
+                name: "Test Recipe",
+                photoURLSmall: nil,
+                photoURLLarge: nil,
+                sourceURL: nil,
+                youtubeURL: nil
+            )
         ]
     }
 
     func fetchImage(from url: URL) async throws -> Data {
-        return UIImage(systemName: "star.fill")!.pngData()!
+        guard let image = UIImage(systemName: "star.fill"),
+              let imageData = image.pngData() else {
+            throw RecipeServiceError.invalidURL
+        }
+        return imageData
     }
 }
 
